@@ -1,0 +1,33 @@
+--SELECT * FROM erc20_bnb.evt_Transfer WHERE contract_address = "0xafbe3b8b0939a5538DE32f7752A78e08C8492295"
+
+WITH transfers as(
+	SELECT
+		value/1e18 as amt,
+		date_trunc('day', evt_block_time) as tspan
+	FROM erc20_bnb.evt_Transfer
+	WHERE
+    	contract_address = '0xafbe3b8b0939a5538de32f7752a78e08c8492295' --eTHENA
+    	and evt_block_number > 24647388        --creation
+),
+
+volume as(
+	SELECT
+		sum(amt) as vol_per_tspan,
+		COUNT(amt) as txc,
+		--sum(taxx) as tax7d,
+		tspan 
+	FROM transfers
+	GROUP BY tspan
+	ORDER BY tspan
+)
+
+SELECT
+	tspan,
+	vol_per_tspan,
+	txc,
+	--tax7d,
+	sum(vol_per_tspan) OVER(ORDER BY tspan) as cumm_vol,
+	--sum(tax7d) OVER(ORDER BY tspan) as cumm_tax,
+	sum(txc) OVER(ORDER BY tspan) as cumm_txs
+FROM volume
+ORDER BY tspan DESC
