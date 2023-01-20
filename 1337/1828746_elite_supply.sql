@@ -16,7 +16,7 @@ WITH transfers as(
 
 volume as(
 	SELECT
-	    week,
+	    week as week,
 		sum(amt) as vol7d,
 		COUNT(amt) as txc,
 		sum(taxx) as tax7d
@@ -26,7 +26,7 @@ volume as(
 )
 
 SELECT
-	weekd,
+	week,
 	vol7d,
 	txc,
 	tax7d,
@@ -34,5 +34,5 @@ SELECT
 	sum(tax7d) OVER(ORDER BY week) as cumm_tax,
 	sum(txc) OVER(ORDER BY week) as cumm_txs,
 	avg(vol7d/txc) OVER(ORDER BY week) as avg_vol_per_tx,
-	avg(tax7d/txc) OVER(ORDER BY week) as avg_tax_per_tx,
+	avg(tax7d/txc) OVER(ORDER BY week) as avg_tax_per_tx
 FROM volume
